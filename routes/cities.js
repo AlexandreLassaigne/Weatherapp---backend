@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const fetch = require("node-fetch");
+require('../models/connection')
 const City = require("../models/cities");
 
 const API_KEY = process.env.API_KEY;

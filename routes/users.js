@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const User = require("../models/users");
+require('../models/connection')
 const { checkBody } = require("../modules/checkBody");
 
 const uid2 = require("uid2");
@@ -11,7 +12,7 @@ router.post("/signup", (req, res) => {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
-  User.finOne({ firstName: req.body.firstName }).then((data) => {
+  User.findOne({ firstName: req.body.firstName }).then((data) => {
     if (data) {
       res.json({ result: false, error: "User already exist" });
     } else {
