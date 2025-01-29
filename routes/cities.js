@@ -23,7 +23,7 @@ router.post("/new", (req, res) => {
               tempMax: data.main.temp_max,
             });
             newCity.save().then((data) => {
-              res.json({ result: true, citie: data });
+              res.json({ result: true, city: data });
             });
           });
       }
