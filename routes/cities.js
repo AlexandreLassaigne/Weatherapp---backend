@@ -11,7 +11,7 @@ router.post("/new", (req, res) => {
     (dataDb) => {
       if (dataDb === null) {
         fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${req.body.name}&appid=${API_KEY}`
+          `https://api.openweathermap.org/data/2.5/weather?q=${req.body.name}&appid=${API_KEY}&units=metric`
         )
           .then((response) => response.json())
           .then((data) => {
