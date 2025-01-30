@@ -1,66 +1,57 @@
 var express = require("express");
 var router = express.Router();
 const fetch = require("node-fetch");
-require('../models/connection')
+require("../models/connection");
 const City = require("../models/cities");
+const User = require("../models/user");
 
 const API_KEY = process.env.API_KEY;
 
-router.post("/new", (req, res) => {
-  City.findOne({ name: { $regex: new RegExp(req.body.name, "i") } }).then(
-    (dataDb) => {
-      if (dataDb === null) {
-        fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${req.body.name}&appid=${API_KEY}&units=metric`
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            const newCity = new City({
-              name: req.body.name,
-              main: data.weather[0].main,
-              description: data.weather[0].description,
-              tempMin: data.main.temp_min,
-              tempMax: data.main.temp_max,
-            });
-            newCity.save().then((data) => {
-              res.json({ result: true, city: data });
-            });
-          });
-      }
-    }
-  );
+router.post("/new", async (req, res) => {
+  const user = await User.findOne({ token: req.body.userToken });
+  if (!user) {
+    res.json({ result: false, error: "user not found" });
+    return;
+  }
+  const user_Id = user._id;
+
+  fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${req.body.name}&appid=${API_KEY}&units=metric`
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      const newCity = new City({
+        user_id: user_Id,
+        name: req.body.name,
+        main: data.weather[0].main,
+        description: data.weather[0].description,
+        tempMin: data.main.temp_min,
+        tempMax: data.main.temp_max,
+      });
+      newCity.save().then((data) => {
+        res.json({ result: true, city: data });
+      });
+    });
 });
 
-router.get("/all", (req, res) => {
-  City.find().then((data) => {
-    if (data) {
-      res.json({ result: true, weather: data });
-    }
+router.get("/:userToken", async (req, res) => {
+  const user = await User.findOne({ token: req.params.userToken });
+  if (!user) {
+    res.json({ result: false, error: "User not found" });
+    return;
+  }
+  const city = await City.find({ user_id: user._id }).select("-user_id");
+  if (city.length > 0) {
+    res.json({ result: true, city });
+  } else {
+    res.json({ result: false, error: "Not history found" });
+  }
+});
+
+router.delete("/deleteCity/:city", (req, res) => {
+  City.deleterOne({ _id: req.params.city }).then((data) => {
+    res.json({ result: true, deleted: data.deletedCount });
   });
 });
-
-router.get("/:city", (req, res) => {
-  City.findOne({
-    name: { $regex: new RegExp(req.params.name, "i") },
-  }).then((data) => {
-    if (data) {
-      res.json({ result: true, weather: data });
-    } else {
-      res.json({ result: false, error: "City not found" });
-    }
-  });
-});
-
-router.delete('/:city', (req, res) => {
-    City.deleterOne({name : { $regex: new RegExp(req.params.name, "i") }}).then(data => {
-        if(data.deleteCount > 0) {
-            City.find().then(city => {
-                res.json({result : true, weather : city})
-            }) 
-        } else {
-            res.json({result : false, error : 'City not found'})
-        }
-    }) 
-})
 
 module.exports = router;

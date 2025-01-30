@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const User = require("../models/users");
+const User = require("../models/user");
 require('../models/connection')
 const { checkBody } = require("../modules/checkBody");
 
@@ -57,5 +57,80 @@ router.post("/signin", (req, res) => {
     }
   });
 });
+
+router.put('changeFirstName', async (req, res) => {
+  if (!checkBody(req.body, ["firstName", "lastName", "password"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+  const user = await User.findOne({token : req.body.token})
+    if(!user){
+      res.json({result : false, error : 'User not found'})
+      return
+    }
+    if(firstName === user.firstName) {
+      res.json({result : false, error : 'FirstName has not change'})
+      return
+    }
+    if(!bcrypt.compareSync(req.body.password, user.password)){
+      res.json({result : false, error : 'Password invalid'})
+      return
+    }
+    user.firstName = firstName;
+    user.save()
+    .then(data => {
+      res.json({result : true, newFirstName : data.firstName})
+    })
+})
+
+router.put('changeLastName', async (req, res) => {
+  if (!checkBody(req.body, ["firstName", "lastName", "password"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+  const user = await User.findOne({token : req.body.token})
+    if(!user){
+      res.json({result : false, error : 'User not found'})
+      return
+    }
+    if(lastName === user.lastName) {
+      res.json({result : false, error : 'LastName has not change'})
+      return
+    }
+    if(!bcrypt.compareSync(req.body.password, user.password)){
+      res.json({result : false, error : 'Password invalid'})
+      return
+    }
+    user.lastName = lastName;
+    user.save()
+    .then(data => {
+      res.json({result : true, newFirstName : data.lastName})
+    })
+})
+
+router.put('changePassword', async (req, res) => {
+  if (!checkBody(req.body, ["firstName", "lastName", "password", "newPassword"])) {
+    res.json({ result: false, error: "Missing or empty fields" });
+    return;
+  }
+  const user = await User.findOne({token : req.body.token})
+    if(!user){
+      res.json({result : false, error : 'User not found'})
+      return
+    }
+    if(!bcrypt.compareSync(req.body.password, user.password)){
+      res.json({result : false, error : 'Password invalid'})
+      return
+    }
+    if(bcrypt.compareSync(req.body.newPassword, user.password)) {
+      res.json({result : false, error : 'Password has not change'})
+      return
+    }
+    user.password = bcrypt.hashSync(newPassword, 10);
+    user.save()
+    .then(() => {
+      res.json({result : true, error : user})
+    })
+})
 
 module.exports = router;
