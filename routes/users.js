@@ -58,12 +58,13 @@ router.post("/signin", (req, res) => {
   });
 });
 
-router.put('changeFirstName', async (req, res) => {
+router.put('/changeFirstName', async (req, res) => {
+  const {token, firstName, lastName, password} = req.body
   if (!checkBody(req.body, ["firstName", "lastName", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
-  const user = await User.findOne({token : req.body.token})
+  const user = await User.findOne({token})
     if(!user){
       res.json({result : false, error : 'User not found'})
       return
@@ -72,7 +73,11 @@ router.put('changeFirstName', async (req, res) => {
       res.json({result : false, error : 'FirstName has not change'})
       return
     }
-    if(!bcrypt.compareSync(req.body.password, user.password)){
+    if(lastName !== user.lastName){
+      res.json({result : false, error : 'LastName is not the same'})
+      return
+    }
+    if(!bcrypt.compareSync(password, user.password)){
       res.json({result : false, error : 'Password invalid'})
       return
     }
@@ -83,12 +88,13 @@ router.put('changeFirstName', async (req, res) => {
     })
 })
 
-router.put('changeLastName', async (req, res) => {
+router.put('/changeLastName', async (req, res) => {
+  const {token, firstName, lastName, password} = req.body
   if (!checkBody(req.body, ["firstName", "lastName", "password"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
-  const user = await User.findOne({token : req.body.token})
+  const user = await User.findOne({token})
     if(!user){
       res.json({result : false, error : 'User not found'})
       return
@@ -97,32 +103,45 @@ router.put('changeLastName', async (req, res) => {
       res.json({result : false, error : 'LastName has not change'})
       return
     }
-    if(!bcrypt.compareSync(req.body.password, user.password)){
+    if(firstName !== user.firstName){
+      res.json({result : false, error : 'FirstName is not the same'})
+      return
+    }
+    if(!bcrypt.compareSync(password, user.password)){
       res.json({result : false, error : 'Password invalid'})
       return
     }
     user.lastName = lastName;
     user.save()
     .then(data => {
-      res.json({result : true, newFirstName : data.lastName})
+      res.json({result : true, newLastName : data.lastName})
     })
 })
 
-router.put('changePassword', async (req, res) => {
+router.put('/changePassword', async (req, res) => {
+  const {token, firstName, lastName, password, newPassword} = req.body
   if (!checkBody(req.body, ["firstName", "lastName", "password", "newPassword"])) {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
-  const user = await User.findOne({token : req.body.token})
+  const user = await User.findOne({token})
     if(!user){
       res.json({result : false, error : 'User not found'})
       return
     }
-    if(!bcrypt.compareSync(req.body.password, user.password)){
+    if(firstName !== user.firstName) {
+      res.json({result : false, error : 'FirstName is not the same'})
+      return
+    }
+    if(lastName !== user.lastName) {
+      res.json({result : false, error : 'LastName is not the same'})
+      return
+    }
+    if(!bcrypt.compareSync(password, user.password)){
       res.json({result : false, error : 'Password invalid'})
       return
     }
-    if(bcrypt.compareSync(req.body.newPassword, user.password)) {
+    if(bcrypt.compareSync(newPassword, user.password)) {
       res.json({result : false, error : 'Password has not change'})
       return
     }

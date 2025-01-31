@@ -49,7 +49,7 @@ router.get("/:userToken", async (req, res) => {
 });
 
 router.delete("/deleteCity/:city", (req, res) => {
-  City.deleterOne({ _id: req.params.city }).then((data) => {
+  City.deleteOne({ _id: req.params.city }).then((data) => {
     res.json({ result: true, deleted: data.deletedCount });
   });
 });
