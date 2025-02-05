@@ -48,10 +48,18 @@ router.get("/:userToken", async (req, res) => {
   }
 });
 
-router.delete("/deleteCity/:city", (req, res) => {
-  City.deleteOne({ _id: req.params.city }).then((data) => {
-    res.json({ result: true, deleted: data.deletedCount });
-  });
+router.delete("/:name", (req, res) => {
+  City.deleteOne({
+    name: { $regex: new RegExp(req.params.name, "i") },
+  }).then(deletedDoc => {
+    if (deletedDoc.deletedCount > 0) {
+      // City successfully deleted, send success response
+      res.json({ result: true });
+    } else {
+      // City not found in the database
+      res.json({ result: false, error: "City not found" });
+    }
+  })
 });
 
 module.exports = router;
