@@ -51,7 +51,7 @@ router.get("/:userToken", async (req, res) => {
 router.delete("/:name", (req, res) => {
   City.deleteOne({
     name: { $regex: new RegExp(req.params.name, "i") },
-  }).then(deletedDoc => {
+  }).then((deletedDoc) => {
     if (deletedDoc.deletedCount > 0) {
       // City successfully deleted, send success response
       res.json({ result: true });
@@ -59,7 +59,7 @@ router.delete("/:name", (req, res) => {
       // City not found in the database
       res.json({ result: false, error: "City not found" });
     }
-  })
+  });
 });
 
 module.exports = router;
