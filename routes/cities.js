@@ -51,7 +51,7 @@ router.get("/:userToken", async (req, res) => {
 });
 
 router.delete("/:name", (req, res) => {
-  City.deleteOne({
+  City.deleteMany({
     name: { $regex: new RegExp(req.params.name, "i") },
   }).then((deletedDoc) => {
     if (deletedDoc.deletedCount > 0) {
