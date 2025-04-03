@@ -57,7 +57,7 @@ router.delete("/:name/:userToken", (req, res) => {
       return;
     }
     City.deleteMany({
-      name: { $regex: new RegExp(req.params.name, "i") },
+      name: { $regex: new RegExp(req.params.name, "i") }, user_id : data._id,
     }).then((deletedDoc) => {
       if (deletedDoc.deletedCount > 0) {
         // City successfully deleted, send success response
