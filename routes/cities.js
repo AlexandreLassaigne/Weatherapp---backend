@@ -26,6 +26,7 @@ router.post("/new", async (req, res) => {
         main: data.weather[0].main,
         description: data.weather[0].description,
         wind : data.wind.speed,
+        deg : data.wind.deg,
         tempMin: data.main.temp_min,
         tempMax: data.main.temp_max,
       });

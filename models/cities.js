@@ -6,6 +6,7 @@ const citySchema = mongoose.Schema({
     main: String,
     description : String,
     wind : Number,
+    deg : Number,
     tempMin : Number,
     tempMax : Number,
 })
