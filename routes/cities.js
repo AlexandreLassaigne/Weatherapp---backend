@@ -25,8 +25,8 @@ router.post("/new", async (req, res) => {
         name: req.body.name,
         main: data.weather[0].main,
         description: data.weather[0].description,
-        wind : data.wind.speed,
-        deg : data.wind.deg,
+        wind: data.wind.speed,
+        deg: data.wind.deg,
         tempMin: data.main.temp_min,
         tempMax: data.main.temp_max,
       });
@@ -50,17 +50,23 @@ router.get("/:userToken", async (req, res) => {
   }
 });
 
-router.delete("/:name", (req, res) => {
-  City.deleteMany({
-    name: { $regex: new RegExp(req.params.name, "i") },
-  }).then((deletedDoc) => {
-    if (deletedDoc.deletedCount > 0) {
-      // City successfully deleted, send success response
-      res.json({ result: true });
-    } else {
-      // City not found in the database
-      res.json({ result: false, error: "City not found" });
+router.delete("/:name/:userToken", (req, res) => {
+  User.findOne({ token: req.params.userToken }).then((data) => {
+    if (!data) {
+      res.json({ result: false, error: "User not found" });
+      return;
     }
+    City.deleteMany({
+      name: { $regex: new RegExp(req.params.name, "i") },
+    }).then((deletedDoc) => {
+      if (deletedDoc.deletedCount > 0) {
+        // City successfully deleted, send success response
+        res.json({ result: true });
+      } else {
+        // City not found in the database
+        res.json({ result: false, error: "City not found" });
+      }
+    });
   });
 });
 
