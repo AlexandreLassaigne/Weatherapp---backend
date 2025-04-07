@@ -12,7 +12,7 @@ router.post("/signup", (req, res) => {
     res.json({ result: false, error: "Missing or empty fields" });
     return;
   }
-  User.findOne({ firstName: req.body.firstName }).then((data) => {
+  User.findOne({ firstName: req.body.firstName, lastName : req.body.lastName }).then((data) => {
     if (data) {
       res.json({ result: false, error: "User already exist" });
     } else {
